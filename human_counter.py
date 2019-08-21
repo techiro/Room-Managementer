@@ -25,7 +25,7 @@ with picamera.PiCamera() as camera:
 
 	# 顔検出の処理効率化のために、写真の情報量を落とす（モノクロにする）
 	grayimg = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-	upper_body_cascade = cv.CascadeClassifier('haarcascade_upperbody.xml')
+	upper_body_cascade = cv.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
 	upper_bodyrect = upper_body_cascade.detectMultiScale(grayimg)
 	# # 顔検出のための学習元データを読み込む
 	# face_cascade = cv.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
