@@ -19,9 +19,9 @@ with picamera.PiCamera() as camera:
 
 	# 撮影した写真を読み込む
 	img = cv.imread(fn)
-	cv.imshow('nom1', img)
-	cv.waitKey(0)
-	cv.destroyAllWindows()
+	#cv.imshow('nom1', img)
+	#cv.waitKey(0)
+	#cv.destroyAllWindows()
 
 	# 顔検出の処理効率化のために、写真の情報量を落とす（モノクロにする）
 	grayimg = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -44,6 +44,12 @@ with picamera.PiCamera() as camera:
 	if len(upper_bodyrect) > 0:
 		for rect in upper_bodyrect:
 			cv.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 0, 255), thickness=3)
+
+	print("len(upper_bodyrect) is ")
+	print(len(upper_bodyrect))
+
+	cv.imwrite("outputimage.png", img)
+	print("image writed !!")
 	# # 顔を検出した場合
 	# if len(facerect) > 0:
 	# 	# 検出した場所すべてに赤色で枠を描画する
@@ -55,13 +61,13 @@ with picamera.PiCamera() as camera:
 	# 	# 検出した場所すべてに緑色で枠を描画する
 	# 	for rect in eyerect:
 	# 		cv.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 255, 0), thickness=3)
-        print("alive")
+	#print("alive")
 	# 結果の画像を表示する
-	cv.imshow('camera', img)
+	#cv.imshow('camera', img)
 	# # 結果を書き出す
-	print("second alive")
-	cv.imwrite(fn, img)
+	#print("second alive")
+	#cv.imwrite(fn, img)
 	# # 何かキーが押されるまで待機する
-	cv.waitKey(0)
+	#cv.waitKey(0)
 	# # 表示したウィンドウを閉じる
-	cv.destroyAllWindows()
+	#cv.destroyAllWindows()
