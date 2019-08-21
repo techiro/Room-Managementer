@@ -22,7 +22,8 @@ with picamera.PiCamera() as camera:
 
 	# 顔検出の処理効率化のために、写真の情報量を落とす（モノクロにする）
 	grayimg = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-	upper_body = cv.CascadeClassifier('haarcascade_upperbody.xml')
+	upper_body_cascade = cv.CascadeClassifier('haarcascade_upperbody.xml')
+	upper_bodyrect = upper_body_cascade.detectMultiScale(grayimg)
 	# # 顔検出のための学習元データを読み込む
 	# face_cascade = cv.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
 	# # 目検出のための学習元データを読み込む
@@ -31,7 +32,7 @@ with picamera.PiCamera() as camera:
 	# facerect = face_cascade.detectMultiScale(grayimg, scaleFactor=1.2, minNeighbors=2, minSize=(1, 1))
 	# # 目検出を行う
 	# eyerect = eye_cascade.detectMultiScale(grayimg)
-        print(upper_body)
+	print(upper_bodyrect)
 	# print(facerect)
 	# print(eyerect)
 
@@ -48,10 +49,9 @@ with picamera.PiCamera() as camera:
 	# 		cv.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 255, 0), thickness=3)
 
 	# 結果の画像を表示する
-	cv.imshow('camera', img)
+	# cv.imshow('camera', img)
 	# # 結果を書き出す
 	cv.imwrite(fn, img)
 	# # 何かキーが押されるまで待機する
 	# cv.waitKey(0)
 	# # 表示したウィンドウを閉じる
-	cv.destroyAllWindows()
