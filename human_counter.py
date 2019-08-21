@@ -32,10 +32,15 @@ with picamera.PiCamera() as camera:
 	# facerect = face_cascade.detectMultiScale(grayimg, scaleFactor=1.2, minNeighbors=2, minSize=(1, 1))
 	# # 目検出を行う
 	# eyerect = eye_cascade.detectMultiScale(grayimg)
+	print("upper_bodyrect is  ")
 	print(upper_bodyrect)
+
 	# print(facerect)
 	# print(eyerect)
 
+	if len(upper_bodyrect) > 0:
+		for rect in upper_bodyrect:
+			cv.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 0, 255), thickness=3)
 	# # 顔を検出した場合
 	# if len(facerect) > 0:
 	# 	# 検出した場所すべてに赤色で枠を描画する
@@ -49,7 +54,7 @@ with picamera.PiCamera() as camera:
 	# 		cv.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 255, 0), thickness=3)
 
 	# 結果の画像を表示する
-	# cv.imshow('camera', img)
+	cv.imshow('camera', img)
 	# # 結果を書き出す
 	cv.imwrite(fn, img)
 	# # 何かキーが押されるまで待機する
