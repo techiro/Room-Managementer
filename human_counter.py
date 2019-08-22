@@ -4,7 +4,7 @@ import time
 import picamera
 import cv2 as cv
 
-fn = 'image.jpg'
+fn = 'media/test4'
 
 # カメラ初期化
 with picamera.PiCamera() as camera:
