@@ -110,11 +110,12 @@ class Media(object):
         self.media_dir = "media/" + str(self.now_datetime.year) + "/" + str(self.now_datetime.month) + "/" + str(self.now_datetime.day)
         confirm_and_create_dir(self.media_dir)
 
-    def take_pic(self, save_path=self.media_path):
+    def take_pic(self, save_path=None):
         print(" ------------  photo mode  -------------")
+        media_save_path = self.media_path if save_path is None else self.media_path
         with picamera.PiCamera() as camera:
             camera.resolution = (1920, 1080)
-            camera.capture(self.media_path)
+            camera.capture(media_save_path)
 
 class RoomData(object):
     def __init__(self, now_datetime, human):
@@ -147,12 +148,13 @@ class RoomData(object):
     def measure_co2(self):
         pass
 
-    def json_data_send(self, url=self.url):
+    def json_data_send(self, url=None):
+        send_url = self.url if url is None else url
         room_json = {"temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
             "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(url, params, headers=headers)
+        response = requests.post(send_url, params, headers=headers)
         print(response)
         response_state = "success !" if response == "<Response [204]>" else "data send failed"
         print(response_state)
