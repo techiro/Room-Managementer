@@ -44,13 +44,14 @@ def read():
   result = mh_z19()
   p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
   if result is not None:
-    return {'CO2': result["co2"]}
-
-if __name__ == '__main__':
-#  value = mh_z19()
-#  print "co2=", value["co2"]
-  value = read()
-  if value is not None:
-    print "co2=", value["CO2"]
+    return result["co2"]
   else:
-    print "None"
+    return "Can't measure"
+# if __name__ == '__main__':
+# #  value = mh_z19()
+# #  print "co2=", value["co2"]
+#   value = read()
+#   if value is not None:
+#     print "co2=", value["CO2"]
+#   else:
+#     print "None"

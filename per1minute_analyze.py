@@ -1,3 +1,5 @@
+import illuminance as illum
+import mh_z19 as mh
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -133,20 +135,20 @@ class RoomData(object):
     def measure_data(self):
         self.measure_temperature
         self.measure_humidity
-        self.measure_illuminance
+        self.measure_illuminance()
         self.measure_pressure
-        self.measure_co2
+        self.measure_co2()
 
     def measure_temperature(self):
         pass
     def measure_humidity(self):
         pass
     def measure_illuminance(self):
-        pass
+        self.illuminance = illum.measure_lux()
     def measure_pressure(self):
         pass
     def measure_co2(self):
-        pass
+        self.co2 = mh.read()
 
     def json_data_send(self, url=None):
         send_url = self.url if url is None else url
