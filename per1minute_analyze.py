@@ -73,10 +73,11 @@ def run_inference_for_single_image(image, graph):
   return output_dict
 
 def confirm_and_create_dir(dirname):
-    if os.path.isdir(dirname):
+    str_dirname = str(dirname)
+    if os.path.isdir(str_dirname):
         pass
     else:
-        os.path.mkdir(dirname)
+        os.makedirs(str_dirname)
 
 detection_graph = tf.Graph()
 with detection_graph.as_default():
@@ -98,21 +99,22 @@ if __name__ == "__main__":
     previous_minute = datetime.datetime.now().minute
     while True:
         if previous_minute != datetime.datetime.now().minute:
+            print("########## photo mode ##########")
             now = datetime.datetime.now()
             previous_minute = now.minute
-            this_year = now.year
-            this_month = now.month
-            this_day = now.day
-            image_save_dir = this_year + "/" + this_month + "/" + this_day
-            confirm_and_create_dir(this_year)
-            confirm_and_create_dir(this_year + "/" + this_month)
+            this_year = str(now.year) + "年"
+            this_month = str(now.month) + "月" 
+            this_day = str(now.day) + "日" 
+            image_save_dir = "media/" + this_year + "/" + this_month + "/" + this_day
+            confirm_and_create_dir("media/" + this_year)
+            confirm_and_create_dir("media/" + this_year + "/" + this_month)
             confirm_and_create_dir(image_save_dir)
-            image_save_path = "media/" + image_save_dir + "/" + now.hour + "_" + now.minute + ".jpg"
+            image_save_path = image_save_dir + "/" + str(now.hour) + "時_" + str(now.minute) + "分.jpg"
             with picamera.PiCamera() as camera:
                 camera.resolution = (1920, 1080)
                 camera.capture(image_save_path)
             media_root, media_ext = os.path.splitext(image_save_path)
-                    
+            print("now analyze")
             image = Image.open(image_save_path)
             image_np = load_image_into_numpy_array(image)
             image_np_expanded = np.expand_dims(image_np, axis=0)
