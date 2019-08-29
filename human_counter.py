@@ -30,9 +30,10 @@ while True:
 if menu_num == 0:
 	print("カメラを起動します。 また、撮影した写真は media/picture.jpg として保存されます")
 	with picamera.PiCamera() as camera:
-	camera.resolution = (1024, 768)
-	camera.capture('media/picture.jpg')
-	media_path = "media/picture.jpg"
+#		camera.resolution = (1024, 768)
+		camera.resolution = (1920, 1080)
+		camera.capture('media/picture.jpg')
+		media_path = "media/picture.jpg"
 elif menu_num == 1:
 	while True:
 		print("写真のパスを拡張子を含めて入力してください")
@@ -87,7 +88,7 @@ def run_inference_for_single_image(image, graph):
         detection_masks_reframed = utils_ops.reframe_box_masks_to_image_masks(
             detection_masks, detection_boxes, image.shape[0], image.shape[1])
         detection_masks_reframed = tf.cast(
-            tf.greater(detection_masks_reframed, 0.5), tf.uint8)
+            tf.greater(detection_masks_reframed, 0.4), tf.uint8)
         # Follow the convention by adding back the batch dimension
         tensor_dict['detection_masks'] = tf.expand_dims(
             detection_masks_reframed, 0)
@@ -114,7 +115,7 @@ output_dict = run_inference_for_single_image(image_np, detection_graph)
 
 person_index = np.where(np.array(output_dict['detection_classes']) == 1)
 pscore_array = np.array(output_dict['detection_scores'])[person_index]
-congestion = len(np.where(pscore_array >= 0.5)[0])
+congestion = len(np.where(pscore_array >= 0.4)[0])
 print(congestion)
 
 vis_util.visualize_boxes_and_labels_on_image_array(
@@ -125,5 +126,6 @@ vis_util.visualize_boxes_and_labels_on_image_array(
       category_index,
       instance_masks=output_dict.get('detection_masks'),
       use_normalized_coordinates=True,
-      line_thickness=8)
-Image.fromarray(image_np).save("media/output_" + media_path)
+      line_thickness=8,
+      min_score_thresh=0.4)
+Image.fromarray(image_np).save(media_root + "_output" + media_ext)
