@@ -6,6 +6,9 @@ import datetime
 import time
 import picamera
 
+import requests
+import json 
+
 import numpy as np
 import os
 import sys
@@ -91,6 +94,70 @@ label_map = label_map_util.load_labelmap('mscoco_label_map.pbtxt')
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=90, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
+
+class Media(object):
+    def __init__(self, now_datetime):
+        self.now_datetime = now_datetime
+        self.media_dir = None
+        self.create_mdeia_directory()
+        self.media_root = self.media_dir + "/" + str(self.now_datetime.hour) + "時_" + str(self.now_datetime.minute) + "分"
+        self.media_ext = ".jpg"
+        self.media_path = self.media_root + self.media_ext
+        self.output_media_path = self.media_root + "_output" + self.media_ext
+        self.take_pic()
+    
+    def create_mdeia_directory(self): 
+        self.media_dir = "media/" + str(self.now_datetime.year) + "/" + str(self.now_datetime.month) + "/" + str(self.now_datetime.day)
+        confirm_and_create_dir(self.media_dir)
+
+    def take_pic(self, save_path=self.media_path):
+        print(" ------------  photo mode  -------------")
+        with picamera.PiCamera() as camera:
+            camera.resolution = (1920, 1080)
+            camera.capture(self.media_path)
+
+class RoomData(object):
+    def __init__(self, now_datetime, human):
+        self.now_datetime = now_datetime
+        self.temperature = 28
+        self.humidity = 60
+        self.illuminance = 750
+        self.pressure = 1013
+        self.co2 = 1000
+        self.human = human
+        self.url = "http://funnel.soracom.io"
+        self.measure_data()
+        self.json_data_send()
+
+    def measure_data(self):
+        self.measure_temperature
+        self.measure_humidity
+        self.measure_illuminance
+        self.measure_pressure
+        self.measure_co2
+
+    def measure_temperature(self):
+        pass
+    def measure_humidity(self):
+        pass
+    def measure_illuminance(self):
+        pass
+    def measure_pressure(self):
+        pass
+    def measure_co2(self):
+        pass
+
+    def json_data_send(self, url=self.url):
+        room_json = {"temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
+            "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
+        params = json.dumps(room_json)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, params, headers=headers)
+        print(response)
+        response_state = "success !" if response == "<Response [204]>" else "data send failed"
+        print(response_state)
+
+
 ###   TensorFlow 制御部 end   ####
 
 if __name__ == "__main__":
@@ -99,23 +166,11 @@ if __name__ == "__main__":
     previous_minute = datetime.datetime.now().minute
     while True:
         if previous_minute != datetime.datetime.now().minute:
-            print("########## photo mode ##########")
             now = datetime.datetime.now()
             previous_minute = now.minute
-            this_year = str(now.year) + "年"
-            this_month = str(now.month) + "月" 
-            this_day = str(now.day) + "日" 
-            image_save_dir = "media/" + this_year + "/" + this_month + "/" + this_day
-            confirm_and_create_dir("media/" + this_year)
-            confirm_and_create_dir("media/" + this_year + "/" + this_month)
-            confirm_and_create_dir(image_save_dir)
-            image_save_path = image_save_dir + "/" + str(now.hour) + "時_" + str(now.minute) + "分.jpg"
-            with picamera.PiCamera() as camera:
-                camera.resolution = (1920, 1080)
-                camera.capture(image_save_path)
-            media_root, media_ext = os.path.splitext(image_save_path)
+            media = Media(now)
             print("now analyze")
-            image = Image.open(image_save_path)
+            image = Image.open(media.media_path)
             image_np = load_image_into_numpy_array(image)
             image_np_expanded = np.expand_dims(image_np, axis=0)
             output_dict = run_inference_for_single_image(image_np, detection_graph)
@@ -123,6 +178,7 @@ if __name__ == "__main__":
             person_index = np.where(np.array(output_dict['detection_classes']) == 1)
             pscore_array = np.array(output_dict['detection_scores'])[person_index]
             congestion = len(np.where(pscore_array >= 0.4)[0])
+            room_data = RoomData(now, congestion)
             print(congestion)
 
             vis_util.visualize_boxes_and_labels_on_image_array(
@@ -137,7 +193,7 @@ if __name__ == "__main__":
                 min_score_thresh=0.4
                 )
                 
-            Image.fromarray(image_np).save(media_root + "_output" + media_ext)
+            Image.fromarray(image_np).save(media.output_media_path)
     
     
 
