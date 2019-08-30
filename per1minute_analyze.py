@@ -1,5 +1,6 @@
 import illuminance as illum
 import mh_z19 as mh
+import bme280_sample as bme
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -133,6 +134,7 @@ class RoomData(object):
         self.json_data_send()
 
     def measure_data(self):
+        bme.readData()
         self.measure_temperature
         self.measure_humidity
         self.measure_illuminance()
@@ -140,13 +142,13 @@ class RoomData(object):
         self.measure_co2()
 
     def measure_temperature(self):
-        pass
+        self.temperature = bme.measure_temperature()
     def measure_humidity(self):
-        pass
+        self.humidity = bme.measure_humidity()
     def measure_illuminance(self):
         self.illuminance = illum.measure_lux()
     def measure_pressure(self):
-        pass
+        self.pressure = bme.measure_pressur()
     def measure_co2(self):
         self.co2 = mh.read()
 
