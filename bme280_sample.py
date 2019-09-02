@@ -1,14 +1,14 @@
-from smself.bus2 import SMself.Bus
+from smbus2 import SMBus
 import time
 
 
 
 class Bme(object):
 	def __init__(self):
-		self.self.bus_number  = 1
+		self.bus_number  = 1
 		self.i2c_address = 0x76
 
-		self.bus = SMself.Bus(self.self.bus_number)
+		self.bus = SMBus.Bus(self.bus_number)
 
 		self.digT = []
 		self.digP = []

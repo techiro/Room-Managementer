@@ -6,7 +6,7 @@
 import serial
 import time
 import subprocess
-import slider_utils as slider
+#import slider_utils as slider
 import getrpimodel
 
 # setting
@@ -34,19 +34,21 @@ def mh_z19():
       if len(s) >= 4 and s[0] == "\xff" and s[1] == "\x86":
         return {'co2': ord(s[2])*256 + ord(s[3])}
       break
-  except IOError:
-    slider.io_error_report()
+#  except IOError:
+#    slider.io_error_report()
+#  except:
+#    slider.unknown_error_report()
   except:
-    slider.unknown_error_report()
+      pass
 
 def read():
-  p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
-  result = mh_z19()
-  p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
-  if result is not None:
-    return result["co2"]
-  else:
-    return "Can't measure"
+    p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
+    result = mh_z19()
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+    if result is not None:
+        return result["co2"]
+    else:
+        return "Can't measure"
 # if __name__ == '__main__':
 # #  value = mh_z19()
 # #  print "co2=", value["co2"]
