@@ -1,6 +1,8 @@
 import illuminance as illum
 import mh_z19 as mh
-import bme280_sample as bme
+import bme280_sample as bme280
+
+import boto3
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -101,17 +103,18 @@ category_index = label_map_util.create_category_index(categories)
 class Media(object):
     def __init__(self, now_datetime):
         self.now_datetime = now_datetime
-        self.media_dir = None
         self.create_mdeia_directory()
-        self.media_root = self.media_dir + "/" + str(self.now_datetime.hour) + "時_" + str(self.now_datetime.minute) + "分"
+        self.media_name = str(self.now_datetime.hour) + "時_" + str(self.now_datetime.minute) + "分"
+        self.media_root = "media/" + self.media_name
         self.media_ext = ".jpg"
         self.media_path = self.media_root + self.media_ext
         self.output_media_path = self.media_root + "_output" + self.media_ext
         self.take_pic()
     
+    @staticmethod
     def create_mdeia_directory(self): 
-        self.media_dir = "media/" + str(self.now_datetime.year) + "/" + str(self.now_datetime.month) + "/" + str(self.now_datetime.day)
-        confirm_and_create_dir(self.media_dir)
+        media_dir = "media/"
+        confirm_and_create_dir(media_dir)
 
     def take_pic(self, save_path=None):
         print(" ------------  photo mode  -------------")
@@ -119,6 +122,17 @@ class Media(object):
         with picamera.PiCamera() as camera:
             camera.resolution = (1920, 1080)
             camera.capture(media_save_path)
+
+class S3(object):
+    def __init__(self):
+        self.bucket_name = None
+        self.upload_file = None
+        self.save_name_as = None
+    
+    def data_send(self):
+        s3_instance = boto3.resource('s3')
+        s3_instance.Bucket(self.bucket_name).upload_file(self.upload_file, self.save_name_as)
+    
 
 class RoomData(object):
     def __init__(self, now_datetime, human):
@@ -135,20 +149,20 @@ class RoomData(object):
 
     def measure_data(self):
         bme.readData()
-        self.measure_temperature
-        self.measure_humidity
-        self.measure_illuminance()
-        self.measure_pressure
-        self.measure_co2()
+        self.measure_temperature()
+        self.measure_humidity()
+        self.measure_pressure()
+        # self.measure_illuminance()
+        # self.measure_co2()
 
     def measure_temperature(self):
-        self.temperature = bme.measure_temperature()
+        self.temperature = bme280.bme.temperature
     def measure_humidity(self):
-        self.humidity = bme.measure_humidity()
+        self.humidity = bme280.bme.humidity
     def measure_illuminance(self):
         self.illuminance = illum.measure_lux()
     def measure_pressure(self):
-        self.pressure = bme.measure_pressur()
+        self.pressure = bme280.bme.pressure
     def measure_co2(self):
         self.co2 = mh.read()
 
@@ -168,13 +182,18 @@ class RoomData(object):
 
 if __name__ == "__main__":
 
-    confirm_and_create_dir("media")
+    Media.create_mdeia_directory()
     previous_minute = datetime.datetime.now().minute
+    s3 = S3()
+    s3.bucket_name = "plute-room-picture"
     while True:
         if previous_minute != datetime.datetime.now().minute:
             now = datetime.datetime.now()
             previous_minute = now.minute
             media = Media(now)
+            s3.upload_file = media.media_path
+            s3.save_name_as = media.media_name + media.media_ext
+            s3.data_send
             print("now analyze")
             image = Image.open(media.media_path)
             image_np = load_image_into_numpy_array(image)
