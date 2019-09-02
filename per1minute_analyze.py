@@ -148,7 +148,7 @@ class RoomData(object):
         self.json_data_send()
 
     def measure_data(self):
-        bme.readData()
+        bme280.readData()
         self.measure_temperature()
         self.measure_humidity()
         self.measure_pressure()
