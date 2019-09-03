@@ -220,6 +220,9 @@ if __name__ == "__main__":
                 )
                 
             Image.fromarray(image_np).save(media.output_media_path)
+            s3.upload_file = media.output_media_path
+            s3.save_name_as = media.media_name + '_output' + media.media_ext
+            s3.data_send()
     
     
 
