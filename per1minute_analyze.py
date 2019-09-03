@@ -112,7 +112,7 @@ class Media(object):
         self.take_pic()
     
     @staticmethod
-    def create_mdeia_directory(self): 
+    def create_mdeia_directory(): 
         media_dir = "media/"
         confirm_and_create_dir(media_dir)
 
@@ -132,7 +132,6 @@ class S3(object):
     def data_send(self):
         s3_instance = boto3.resource('s3')
         s3_instance.Bucket(self.bucket_name).upload_file(self.upload_file, self.save_name_as)
-    
 
 class RoomData(object):
     def __init__(self, now_datetime, human):
@@ -143,15 +142,17 @@ class RoomData(object):
         self.pressure = 1013
         self.co2 = 1000
         self.human = human
+        self.device_name = "raspi_1"
         self.url = "http://funnel.soracom.io"
         self.measure_data()
         self.json_data_send()
 
     def measure_data(self):
-        bme280.readData()
+        bme280.bme.readData()
         self.measure_temperature()
         self.measure_humidity()
         self.measure_pressure()
+        print("into measure_data()")
         # self.measure_illuminance()
         # self.measure_co2()
 
@@ -168,7 +169,7 @@ class RoomData(object):
 
     def json_data_send(self, url=None):
         send_url = self.url if url is None else url
-        room_json = {"temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
+        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
             "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
@@ -193,7 +194,7 @@ if __name__ == "__main__":
             media = Media(now)
             s3.upload_file = media.media_path
             s3.save_name_as = media.media_name + media.media_ext
-            s3.data_send
+            s3.data_send()
             print("now analyze")
             image = Image.open(media.media_path)
             image_np = load_image_into_numpy_array(image)
