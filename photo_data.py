@@ -1,24 +1,29 @@
+# for AWS S3
 import boto3
+
+# logging error 
+import logging
 
 import warnings
 warnings.filterwarnings('ignore')
 
+# raspi camera and save photo 
 import datetime
 import time
 import picamera
 
+# for AWS Dynamodb through soracom and aws IoT
 import requests
 import json 
 
+# for object recognation
 import numpy as np
 import os
 import sys
 import tensorflow as tf
-
 from collections import defaultdict
 from io import StringIO
 from PIL import Image
-
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
@@ -149,47 +154,61 @@ class RoomData(object):
 
 if __name__ == "__main__":
 
-    Media.create_mdeia_directory()
-    previous_minute = datetime.datetime.now().minute
-    s3 = S3()
-    s3.bucket_name = "plute-room-picture"
-    while True:
-        if previous_minute != datetime.datetime.now().minute:
-            now = datetime.datetime.now()
-            previous_minute = now.minute
-            media = Media(now)
-            s3.upload_file = media.media_path
-            s3.save_name_as = media.media_name + media.media_ext
-            s3.data_send()
-            print("now analyze")
-            image = Image.open(media.media_path)
-            image_np = load_image_into_numpy_array(image)
-            image_np_expanded = np.expand_dims(image_np, axis=0)
-            output_dict = run_inference_for_single_image(image_np, detection_graph)
+    try:
+        Media.create_mdeia_directory()
+        previous_minute = datetime.datetime.now().minute
+        s3 = S3()
+        s3.bucket_name = "plute-room-picture"
+        while True:
+            if previous_minute != datetime.datetime.now().minute:
+                now = datetime.datetime.now()
+                previous_minute = now.minute
+                media = Media(now)
+                s3.upload_file = media.media_path
+                s3.save_name_as = media.media_name + media.media_ext
+                s3.data_send()
+                print("now analyze")
+                image = Image.open(media.media_path)
+                image_np = load_image_into_numpy_array(image)
+                image_np_expanded = np.expand_dims(image_np, axis=0)
+                output_dict = run_inference_for_single_image(image_np, detection_graph)
 
-            person_index = np.where(np.array(output_dict['detection_classes']) == 1)
-            pscore_array = np.array(output_dict['detection_scores'])[person_index]
-            congestion = len(np.where(pscore_array >= 0.4)[0])
-            room_data = RoomData(now, congestion)
-            room_data.json_data_send()
-            print(congestion)
+                person_index = np.where(np.array(output_dict['detection_classes']) == 1)
+                pscore_array = np.array(output_dict['detection_scores'])[person_index]
+                congestion = len(np.where(pscore_array >= 0.4)[0])
+                room_data = RoomData(now, congestion)
+                room_data.json_data_send()
+                print(congestion)
 
-            vis_util.visualize_boxes_and_labels_on_image_array(
-                image_np,
-                output_dict['detection_boxes'],
-                output_dict['detection_classes'],
-                output_dict['detection_scores'],
-                category_index,
-                instance_masks=output_dict.get('detection_masks'),
-                use_normalized_coordinates=True,
-                line_thickness=8,
-                min_score_thresh=0.4
-                )
-                
-            Image.fromarray(image_np).save(media.output_media_path)
-            s3.upload_file = media.output_media_path
-            s3.save_name_as = media.media_name + '_output' + media.media_ext
-            s3.data_send()
+                vis_util.visualize_boxes_and_labels_on_image_array(
+                    image_np,
+                    output_dict['detection_boxes'],
+                    output_dict['detection_classes'],
+                    output_dict['detection_scores'],
+                    category_index,
+                    instance_masks=output_dict.get('detection_masks'),
+                    use_normalized_coordinates=True,
+                    line_thickness=8,
+                    min_score_thresh=0.4
+                    )
+                    
+                Image.fromarray(image_np).save(media.output_media_path)
+                s3.upload_file = media.output_media_path
+                s3.save_name_as = media.media_name + '_output' + media.media_ext
+                s3.data_send()
+    except:
+        log_dir = 'log'
+        if os.path.isdir(log_dir):
+            pass
+        else:
+            os.makedirs(log_dir)
+
+        logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+        logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
+        
+        logging.error(traceback.format_exc())
+        sys.exit()
+
     
     
 
