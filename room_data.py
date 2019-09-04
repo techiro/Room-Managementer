@@ -10,6 +10,7 @@ import json
 
 import os
 import sys
+import logging
 
 class RoomData(object):
     def __init__(self, now_datetime):
@@ -32,7 +33,7 @@ class RoomData(object):
         
         # self.measure_illuminance()
 
-        # self.measure_co2()
+        self.measure_co2()
 
     def measure_temperature(self):
         self.temperature = bme280.bme.temperature
@@ -52,9 +53,12 @@ class RoomData(object):
 
     def json_data_send(self, url=None):
         send_url = self.url if url is None else url
-        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, \ 
-            "humidity" : self.humidity, "illuminance" : self.illuminance, \
-            "pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human, "measured_time" : self.now_datetime}
+        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance,"pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human, "measured_time" : self.now_datetime.strftime('%s')}
+#        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
+#            "pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human,  "measured_time" : self.now_datetime}
+#        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
+#            "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
+        print(room_json)
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
@@ -62,15 +66,29 @@ class RoomData(object):
 
 
 if __name__ == "__main__":
+    previous_minute = datetime.datetime.now().minute
+    try:
+        while True:
+            if previous_minute != datetime.datetime.now().minute:
+                print("now is {0}".format(datetime.datetime.now()))
+                now = datetime.datetime.now()
+                previous_minute = now.minute
+                room_data = RoomData(now)
+                room_data.measure_data()
+                room_data.json_data_send()
+    except:
+        import traceback
+        log_dir = 'log'
+        if os.path.isdir(log_dir):
+            pass
+        else:
+            os.makedirs(log_dir)
 
-    while True:
-        if previous_minute != datetime.datetime.now().minute:
-            print("now is {0}".format(datetime.datetime.now()))
-            now = datetime.datetime.now()
-            previous_minute = now.minute
-            room_data = RoomData(now)
-            room_data.measure_data()
-            room_data.json_data_send()
+        logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+        logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
+        
+        logging.error(traceback.format_exc())
+        sys.exit()
 
     
     

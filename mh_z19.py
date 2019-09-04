@@ -8,7 +8,7 @@ import time
 import subprocess
 #import slider_utils as slider
 import getrpimodel
-
+import traceback
 # setting
 
 if getrpimodel.model() == "3 Model B":
@@ -29,31 +29,35 @@ def mh_z19():
                         stopbits=serial.STOPBITS_ONE,
                         timeout=1.0)
     while 1:
-      result=ser.write("\xff\x01\x86\x00\x00\x00\x00\x00\x79")
+      result=ser.write(b"\xff\x01\x86\x00\x00\x00\x00\x00\x79")
       s=ser.read(9)
-      if len(s) >= 4 and s[0] == "\xff" and s[1] == "\x86":
-        return {'co2': ord(s[2])*256 + ord(s[3])}
+      if len(s) >= 4 and s[0] == 255 and s[1] == 134:
+        return s[2]*256 + s[3]
       break
 #  except IOError:
 #    slider.io_error_report()
 #  except:
 #    slider.unknown_error_report()
   except:
+      print("error")
+      print(traceback.format_exc())
       pass
 
 def read():
     p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
     result = mh_z19()
+    print(result)
     p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
     if result is not None:
-        return result["co2"]
+        return result
     else:
-        return "Can't measure"
-# if __name__ == '__main__':
+        return None
+if __name__ == '__main__':
 # #  value = mh_z19()
 # #  print "co2=", value["co2"]
-#   value = read()
-#   if value is not None:
-#     print "co2=", value["CO2"]
-#   else:
-#     print "None"
+    value = read()
+    if value is not None:
+        print(value)
+    else:
+        print("None")
+
