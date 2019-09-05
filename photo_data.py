@@ -3,6 +3,7 @@ import boto3
 
 # logging error 
 import logging
+import traceback
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -110,6 +111,7 @@ class Media(object):
         self.media_ext = ".jpg"
         self.media_path = self.media_root + self.media_ext
         self.output_media_path = self.media_root + "_output" + self.media_ext
+        print("self.media_path is {0}\n self.output_media_path is {1}".format(self.media_path, self.output_media_path))
         self.take_pic()
     
     @staticmethod
@@ -123,6 +125,10 @@ class Media(object):
         with picamera.PiCamera() as camera:
             camera.resolution = (1920, 1080)
             camera.capture(media_save_path)
+            print("photo captured !!")
+    def delete_media(self):
+        os.remove(self.media_path)
+        os.remove(self.output_media_path)
 
 class S3(object):
     def __init__(self):
@@ -196,6 +202,7 @@ if __name__ == "__main__":
                 s3.upload_file = media.output_media_path
                 s3.save_name_as = media.media_name + '_output' + media.media_ext
                 s3.data_send()
+                media.delete_media()
     except:
         log_dir = 'log'
         if os.path.isdir(log_dir):
@@ -204,7 +211,7 @@ if __name__ == "__main__":
             os.makedirs(log_dir)
 
         logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-        logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
+        logging.basicConfig(filename='log/photo_data_log', level=logging.ERROR, format=logging_fmt)
         
         logging.error(traceback.format_exc())
         sys.exit()
