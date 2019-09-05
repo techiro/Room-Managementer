@@ -2,6 +2,8 @@ import illuminance as illum
 import mh_z19 as mh
 import bme280_sample as bme280
 
+import weather_receive as weather
+
 import boto3
 
 import datetime
@@ -23,6 +25,7 @@ class RoomData(object):
         self.co2 = 1000
         self.device_name = "raspi_2"
         self.url = "http://funnel.soracom.io"
+        self.room_datas = None
 
     def measure_data(self):
         print("now, getting temperature, humidity, pressure, by bme280")
@@ -51,21 +54,26 @@ class RoomData(object):
         pass
         #self.exist_human = 
 
-    def json_data_send(self, url=None):
+    def send_data_make(self, dict_data=None):
+        self.room_datas = {"device_name" : self.device_name, "temperature" : self.temperature, \
+            "humidity" : self.humidity, "illuminance" : self.illuminance,\
+                "pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human, \
+                "measured_time" : self.now_datetime.strftime('%s')}
+        if dict_data is not None:
+            self.room_datas.update(dict_data)
+
+    def data_send_as_json(self, url=None):
         send_url = self.url if url is None else url
-        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance,"pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human, "measured_time" : self.now_datetime.strftime('%s')}
-#        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
-#            "pressure" : self.pressure, "CO2" : self.co2, "exist_human" : self.exist_human,  "measured_time" : self.now_datetime}
-#        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
-#            "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
-        print(room_json)
-        params = json.dumps(room_json)
+        params = json.dumps(self.room_datas)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
         print(response)
 
 
 if __name__ == "__main__":
+    weather_data = weather.Weather_api_data()
+    weather_data.get_weather_data()
+
     previous_minute = datetime.datetime.now().minute
     try:
         while True:
@@ -75,7 +83,12 @@ if __name__ == "__main__":
                 previous_minute = now.minute
                 room_data = RoomData(now)
                 room_data.measure_data()
-                room_data.json_data_send()
+                weather_data = weather.Weather_api_data()
+                weather_data.get_weather_data()
+                outside = weather_data.read_main_data()
+                outside.update("weather":weather_data.read_weather_data())
+                room_data.send_data_make(outside)
+                room_data.data_send_as_json()
     except:
         import traceback
         log_dir = 'log'
