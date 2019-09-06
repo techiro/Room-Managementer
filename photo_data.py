@@ -3,6 +3,7 @@ import boto3
 
 # logging error 
 import logging
+import traceback
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -110,6 +111,7 @@ class Media(object):
         self.media_ext = ".jpg"
         self.media_path = self.media_root + self.media_ext
         self.output_media_path = self.media_root + "_output" + self.media_ext
+        print("self.media_path is {0}\n self.output_media_path is {1}".format(self.media_path, self.output_media_path))
         self.take_pic()
     
     @staticmethod
@@ -123,6 +125,10 @@ class Media(object):
         with picamera.PiCamera() as camera:
             camera.resolution = (1920, 1080)
             camera.capture(media_save_path)
+            print("photo captured !!")
+    def delete_media(self):
+        os.remove(self.media_path)
+        os.remove(self.output_media_path)
 
 class S3(object):
     def __init__(self):
@@ -152,64 +158,66 @@ class RoomData(object):
 
 ###   TensorFlow 制御部 end   ####
 
+def main():
+    Media.create_mdeia_directory()
+    previous_minute = datetime.datetime.now().minute
+    s3 = S3()
+    s3.bucket_name = "plute-room-picture"
+    while True:
+        if previous_minute != datetime.datetime.now().minute:
+            now = datetime.datetime.now()
+            previous_minute = now.minute
+            media = Media(now)
+            s3.upload_file = media.media_path
+            s3.save_name_as = media.media_name + media.media_ext
+            s3.data_send()
+            print("now analyze")
+            image = Image.open(media.media_path)
+            image_np = load_image_into_numpy_array(image)
+            image_np_expanded = np.expand_dims(image_np, axis=0)
+            output_dict = run_inference_for_single_image(image_np, detection_graph)
+
+            person_index = np.where(np.array(output_dict['detection_classes']) == 1)
+            pscore_array = np.array(output_dict['detection_scores'])[person_index]
+            congestion = len(np.where(pscore_array >= 0.4)[0])
+            room_data = RoomData(now, congestion)
+            room_data.json_data_send()
+            print(congestion)
+
+            vis_util.visualize_boxes_and_labels_on_image_array(
+                image_np,
+                output_dict['detection_boxes'],
+                output_dict['detection_classes'],
+                output_dict['detection_scores'],
+                category_index,
+                instance_masks=output_dict.get('detection_masks'),
+                use_normalized_coordinates=True,
+                line_thickness=8,
+                min_score_thresh=0.4
+                )
+                
+            Image.fromarray(image_np).save(media.output_media_path)
+            s3.upload_file = media.output_media_path
+            s3.save_name_as = media.media_name + '_output' + media.media_ext
+            s3.data_send()
+            media.delete_media()
+
+
 if __name__ == "__main__":
+    while True:
+        try:
+            main()
+        except:
+            print("-----  into  except  ------ ")
 
-    try:
-        Media.create_mdeia_directory()
-        previous_minute = datetime.datetime.now().minute
-        s3 = S3()
-        s3.bucket_name = "plute-room-picture"
-        while True:
-            if previous_minute != datetime.datetime.now().minute:
-                now = datetime.datetime.now()
-                previous_minute = now.minute
-                media = Media(now)
-                s3.upload_file = media.media_path
-                s3.save_name_as = media.media_name + media.media_ext
-                s3.data_send()
-                print("now analyze")
-                image = Image.open(media.media_path)
-                image_np = load_image_into_numpy_array(image)
-                image_np_expanded = np.expand_dims(image_np, axis=0)
-                output_dict = run_inference_for_single_image(image_np, detection_graph)
+            log_dir = 'log'
+            if os.path.isdir(log_dir):
+                pass
+            else:
+                os.makedirs(log_dir)
 
-                person_index = np.where(np.array(output_dict['detection_classes']) == 1)
-                pscore_array = np.array(output_dict['detection_scores'])[person_index]
-                congestion = len(np.where(pscore_array >= 0.4)[0])
-                room_data = RoomData(now, congestion)
-                room_data.json_data_send()
-                print(congestion)
-
-                vis_util.visualize_boxes_and_labels_on_image_array(
-                    image_np,
-                    output_dict['detection_boxes'],
-                    output_dict['detection_classes'],
-                    output_dict['detection_scores'],
-                    category_index,
-                    instance_masks=output_dict.get('detection_masks'),
-                    use_normalized_coordinates=True,
-                    line_thickness=8,
-                    min_score_thresh=0.4
-                    )
-                    
-                Image.fromarray(image_np).save(media.output_media_path)
-                s3.upload_file = media.output_media_path
-                s3.save_name_as = media.media_name + '_output' + media.media_ext
-                s3.data_send()
-    except:
-        log_dir = 'log'
-        if os.path.isdir(log_dir):
-            pass
-        else:
-            os.makedirs(log_dir)
-
-        logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-        logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
-        
-        logging.error(traceback.format_exc())
-        sys.exit()
+            logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+            logging.basicConfig(filename='log/photo_data_log', level=logging.ERROR, format=logging_fmt)
+            logging.error(traceback.format_exc())
 
     
-    
-
-
