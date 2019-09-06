@@ -75,33 +75,34 @@ if __name__ == "__main__":
     weather_data.get_weather_data()
 
     previous_minute = datetime.datetime.now().minute
-    try:
-        while True:
-            if previous_minute != datetime.datetime.now().minute:
-                print("now is {0}".format(datetime.datetime.now()))
-                now = datetime.datetime.now()
-                previous_minute = now.minute
-                room_data = RoomData(now)
-                room_data.measure_data()
-                weather_data = weather.Weather_api_data()
-                weather_data.get_weather_data()
-                outside = weather_data.read_main_data()
-                outside.update("weather":weather_data.read_weather_data())
-                room_data.send_data_make(outside)
-                room_data.data_send_as_json()
-    except:
-        import traceback
-        log_dir = 'log'
-        if os.path.isdir(log_dir):
-            pass
-        else:
-            os.makedirs(log_dir)
+    while True:
+        try:
+            while True:
+                if previous_minute != datetime.datetime.now().minute:
+                    print("now is {0}".format(datetime.datetime.now()))
+                    now = datetime.datetime.now()
+                    previous_minute = now.minute
+                    room_data = RoomData(now)
+                    room_data.measure_data()
+                    weather_data = weather.Weather_api_data()
+                    weather_data.get_weather_data()
+                    outside = weather_data.read_main_data()
+                    outside.update("weather":weather_data.read_weather_data())
+                    room_data.send_data_make(outside)
+                    room_data.data_send_as_json()
+        except:
+            import traceback
+            log_dir = 'log'
+            if os.path.isdir(log_dir):
+                pass
+            else:
+                os.makedirs(log_dir)
 
-        logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-        logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
-        
-        logging.error(traceback.format_exc())
-        sys.exit()
+            logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+            logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
+            
+            logging.error(traceback.format_exc())
+            # sys.exit()
 
     
     
