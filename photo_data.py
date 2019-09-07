@@ -29,6 +29,10 @@ from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
 
+##   logging for debug
+logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+logging.basicConfig(filename='log/photo_data_log', level=logging.info, format=logging_fmt)
+
 ###   TensorFlow 制御部       ####
 
 def load_image_into_numpy_array(image):
@@ -153,6 +157,7 @@ class RoomData(object):
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
+        logging.info("data send !! response is {0}".format(response))
         print(response)
 
 
@@ -216,8 +221,7 @@ if __name__ == "__main__":
             else:
                 os.makedirs(log_dir)
 
-            logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-            logging.basicConfig(filename='log/photo_data_log', level=logging.ERROR, format=logging_fmt)
+
             logging.error(traceback.format_exc())
 
     

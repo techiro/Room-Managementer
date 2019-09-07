@@ -14,6 +14,12 @@ import os
 import sys
 import logging
 
+import traceback
+
+logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+logging.basicConfig(filename='log/room_data_log', level=logging.INFO, format=logging_fmt)
+
+
 class RoomData(object):
     def __init__(self, now_datetime):
         self.now_datetime = now_datetime
@@ -67,10 +73,12 @@ class RoomData(object):
         params = json.dumps(self.room_datas)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
+        logging.info("data send !! response is {0}".format(response))
         print(response)
 
 
 if __name__ == "__main__":
+ 
     weather_data = weather.Weather_api_data()
     weather_data.get_weather_data()
 
@@ -91,16 +99,12 @@ if __name__ == "__main__":
                     room_data.send_data_make(outside)
                     room_data.data_send_as_json()
         except:
-            import traceback
+
             log_dir = 'log'
             if os.path.isdir(log_dir):
                 pass
             else:
-                os.makedirs(log_dir)
-
-            logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-            logging.basicConfig(filename='log/room_data_log', level=logging.ERROR, format=logging_fmt)
-            
+                os.makedirs(log_dir)           
             logging.error(traceback.format_exc())
             # sys.exit()
 
