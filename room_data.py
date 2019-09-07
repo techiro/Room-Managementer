@@ -95,7 +95,7 @@ if __name__ == "__main__":
                     weather_data = weather.Weather_api_data()
                     weather_data.get_weather_data()
                     outside = weather_data.read_main_data()
-                    outside.update("weather":weather_data.read_weather_data())
+                    outside.update({"weather":weather_data.read_weather_data()})
                     room_data.send_data_make(outside)
                     room_data.data_send_as_json()
         except:

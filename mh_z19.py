@@ -47,7 +47,7 @@ def read():
     p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
     result = mh_z19()
     print(result)
-    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+#    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
     if result is not None:
         return result
     else:
