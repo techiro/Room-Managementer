@@ -10,8 +10,8 @@ def cast_timestamp_array_to_datetime(timestamp_array):
 
 class SpaceData(object):
     def __init__(self, data_dict):
-        # self.container = data_dict[1:]
-        self.container = data_dict
+        self.container = data_dict[1:]
+        self.counter = data_dict[0]
         self.temp_max = self._float_data_extraction("temp_max")
         self.temp_min = self._float_data_extraction("temp_min")
         self.outside_temp = self._float_data_extraction("temp")
@@ -48,6 +48,7 @@ class dynamoData(object):
         self.table = self.dynamodb.Table('plute_room_data')
         self.device_name = device_name
 
+
     def _get_data(self, from_datetime, to_datetime):
         print("get data from {0} to {1}".format(from_datetime, to_datetime))
         from_timestamp = int(from_datetime.timestamp() * 1000)
@@ -55,10 +56,10 @@ class dynamoData(object):
         response = self.table.query(KeyConditionExpression=Key('device_name').eq(self.device_name) & Key('datatime').between(from_timestamp, to_timestamp))
         # header として device_nameを先頭に追加した後、dynamodbから取得したデータを連結させる
         # data = [self.device_name]
-        data = []
+        data = [response['Count']]
         for i in range(response['Count']):
             data.append(response['Items'][i]['payloads'])
-
+        print(data)
         if self.device_name == 'raspi_1':
             return HumanData(data)
         elif self.device_name == 'raspi_2':
@@ -97,5 +98,7 @@ if __name__ == "__main__":
     today_data = raspi_2_data.get_today_data()
     yesterday_data = raspi_2_data.get_yesterday_data()
     print(yesterday_data.room_temperature)
+    print(yesterday_data.counter)
+    print(len(yesterday_data.room_temperature))
 
     
