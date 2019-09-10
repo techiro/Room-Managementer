@@ -1,0 +1,365 @@
+2019-09-04 16:37:47,553  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 72, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-04 16:48:56,296  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 80, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-04 16:57:38,384  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-04 17:13:35,288  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-04 17:14:56,234  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-04 17:17:45,479  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-05 10:29:23,995  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-05 10:33:36,324  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-05 10:40:57,534  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-05 10:41:24,398  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-05 10:41:37,264  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-05 11:03:54,245  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-05 11:09:46,885  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    #    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-06 11:44:20,209  ERROR  root 
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 159, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/usr/lib/python3/dist-packages/urllib3/util/connection.py", line 57, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File "/usr/lib/python3.7/socket.py", line 748, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 354, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.7/http/client.py", line 1229, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.7/http/client.py", line 1275, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.7/http/client.py", line 1224, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.7/http/client.py", line 1016, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.7/http/client.py", line 956, in send
+    self.connect()
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 181, in connect
+    conn = self._new_conn()
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 168, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x75aa54b0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 449, in send
+    timeout=timeout
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/usr/lib/python3/dist-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='api.openweathermap.org', port=80): Max retries exceeded with url: /data/2.5/weather?id=1850418&units=metric&appid=21ec29a9917727f99bbe7dd28fd0c2fb (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x75aa54b0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "room_data.py", line 88, in <module>
+    weather_data.get_weather_data()
+  File "/home/pi/Desktop/Room-Managementer/weather_receive.py", line 59, in get_weather_data
+    self.weather_data_json = requests.get("{0}?id={1}&units=metric&appid={2}".format(self.BASE_URL, self.location_id, self.API_KEY)).json()
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 75, in get
+    return request('get', url, params=params, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 60, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 533, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 646, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='api.openweathermap.org', port=80): Max retries exceeded with url: /data/2.5/weather?id=1850418&units=metric&appid=21ec29a9917727f99bbe7dd28fd0c2fb (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x75aa54b0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+
+
+2019-09-06 14:45:20,845  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-06 14:45:21,018  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 47, in read
+    p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-06 14:45:23,792  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:23,922  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:24,061  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:24,210  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:24,386  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:24,604  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:25,308  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:45:26,794  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 81, in <module>
+    if previous_minute != datetime.datetime.now().minute:
+KeyboardInterrupt
+
+
+2019-09-06 14:50:58,228  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+
+2019-09-06 14:50:57,311  ERROR  root 
+Traceback (most recent call last):
+  File "room_data.py", line 86, in <module>
+    room_data.measure_data()
+  File "room_data.py", line 39, in measure_data
+    self.measure_co2()
+  File "room_data.py", line 52, in measure_co2
+    self.co2 = mh.read()
+  File "/home/pi/Desktop/Room-Managementer/mh_z19.py", line 50, in read
+    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
+  File "/usr/lib/python3.7/subprocess.py", line 325, in call
+    return p.wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 990, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.7/subprocess.py", line 1624, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/lib/python3.7/subprocess.py", line 1582, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+

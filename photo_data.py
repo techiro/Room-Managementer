@@ -1,31 +1,37 @@
-import illuminance as illum
-import mh_z19 as mh
-import bme280_sample as bme280
-
+# for AWS S3
 import boto3
+
+# logging error 
+import logging
+import traceback
 
 import warnings
 warnings.filterwarnings('ignore')
 
+# raspi camera and save photo 
 import datetime
 import time
 import picamera
 
+# for AWS Dynamodb through soracom and aws IoT
 import requests
 import json 
 
+# for object recognation
 import numpy as np
 import os
 import sys
 import tensorflow as tf
-
 from collections import defaultdict
 from io import StringIO
 from PIL import Image
-
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
+
+##   logging for debug
+logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+logging.basicConfig(filename='log/photo_data_log', level=logging.info, format=logging_fmt)
 
 ###   TensorFlow 制御部       ####
 
@@ -109,6 +115,7 @@ class Media(object):
         self.media_ext = ".jpg"
         self.media_path = self.media_root + self.media_ext
         self.output_media_path = self.media_root + "_output" + self.media_ext
+        print("self.media_path is {0}\n self.output_media_path is {1}".format(self.media_path, self.output_media_path))
         self.take_pic()
     
     @staticmethod
@@ -122,6 +129,10 @@ class Media(object):
         with picamera.PiCamera() as camera:
             camera.resolution = (1920, 1080)
             camera.capture(media_save_path)
+            print("photo captured !!")
+    def delete_media(self):
+        os.remove(self.media_path)
+        os.remove(self.output_media_path)
 
 class S3(object):
     def __init__(self):
@@ -136,53 +147,23 @@ class S3(object):
 class RoomData(object):
     def __init__(self, now_datetime, human):
         self.now_datetime = now_datetime
-        self.temperature = 28
-        self.humidity = 60
-        self.illuminance = 750
-        self.pressure = 1013
-        self.co2 = 1000
         self.human = human
         self.device_name = "raspi_1"
         self.url = "http://funnel.soracom.io"
-        self.measure_data()
-        self.json_data_send()
-
-    def measure_data(self):
-        bme280.bme.readData()
-        self.measure_temperature()
-        self.measure_humidity()
-        self.measure_pressure()
-        print("into measure_data()")
-        # self.measure_illuminance()
-        # self.measure_co2()
-
-    def measure_temperature(self):
-        self.temperature = bme280.bme.temperature
-    def measure_humidity(self):
-        self.humidity = bme280.bme.humidity
-    def measure_illuminance(self):
-        self.illuminance = illum.measure_lux()
-    def measure_pressure(self):
-        self.pressure = bme280.bme.pressure
-    def measure_co2(self):
-        self.co2 = mh.read()
 
     def json_data_send(self, url=None):
         send_url = self.url if url is None else url
-        room_json = {"device_name" : self.device_name, "temperature" : self.temperature, "humidity" : self.humidity, "illuminance" : self.illuminance, \
-            "pressure" : self.pressure, "CO2" : self.co2, "human" : self.human}
+        room_json = {"device_name" : self.device_name, "human" : self.human}
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
+        logging.info("data send !! response is {0}".format(response))
         print(response)
-        response_state = "success !" if response == "<Response [204]>" else "data send failed"
-        print(response_state)
 
 
 ###   TensorFlow 制御部 end   ####
 
-if __name__ == "__main__":
-
+def main():
     Media.create_mdeia_directory()
     previous_minute = datetime.datetime.now().minute
     s3 = S3()
@@ -205,6 +186,7 @@ if __name__ == "__main__":
             pscore_array = np.array(output_dict['detection_scores'])[person_index]
             congestion = len(np.where(pscore_array >= 0.4)[0])
             room_data = RoomData(now, congestion)
+            room_data.json_data_send()
             print(congestion)
 
             vis_util.visualize_boxes_and_labels_on_image_array(
@@ -223,7 +205,23 @@ if __name__ == "__main__":
             s3.upload_file = media.output_media_path
             s3.save_name_as = media.media_name + '_output' + media.media_ext
             s3.data_send()
-    
-    
+            media.delete_media()
 
 
+if __name__ == "__main__":
+    while True:
+        try:
+            main()
+        except:
+            print("-----  into  except  ------ ")
+
+            log_dir = 'log'
+            if os.path.isdir(log_dir):
+                pass
+            else:
+                os.makedirs(log_dir)
+
+
+            logging.error(traceback.format_exc())
+
+    
