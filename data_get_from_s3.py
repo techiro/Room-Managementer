@@ -153,9 +153,9 @@ class MergeDynamoData(SpaceData, HumanData):
             self.co2 = self._data_adjust(raspi_2_day_data.co2, raspi_2_time_adjust)
             self.human_counter = self._data_adjust(raspi_1_day_data.human_counter, raspi_1_time_adjust)
             self.timestamp = cast_datetime_array_to_timestamp(self.time)
+            self.counter = len(self.timestamp)
 
         return self
-
 
     def _data_adjust(self, data_array, time_array):
         new_data_array = []
@@ -168,15 +168,11 @@ class MergeDynamoData(SpaceData, HumanData):
                 new_data_array.append(None)
         return new_data_array
         
-            
-        
     def _compare_time_array(self, data_time_array):
         new_data_time_array = []
         j = 0
         for i in range(len(data_time_array)):
             if self.this_days_datetime_array[i + j] == data_time_array[i]:
-                # print("{0}".format(data_time_array[i]))
-                # print("{0}  {1}  True".format(self.this_days_datetime_array[i + j], data_time_array[i]))
                 new_data_time_array.append(True)
             else:
                 # print(" ------- error raised -------")
@@ -185,10 +181,8 @@ class MergeDynamoData(SpaceData, HumanData):
                     if self.this_days_datetime_array[k] == data_time_array[i]:
                         j = k - i
                         break
-                    # print("{0}  {1}  False".format(self.this_days_datetime_array[k], data_time_array[i]))
-                # print(i)
-        # print(len(new_data_time_array))
-        # print(len(data_time_array))
+        for i in range(len(self.this_days_datetime_array) - len(new_data_time_array)):
+            new_data_time_array.append(False)
         return new_data_time_array
 
 
@@ -235,15 +229,15 @@ if __name__ == "__main__":
     # print(two_days_ago_data.timestamp)
     mergeDynamoData = MergeDynamoData()
     a = mergeDynamoData.get_today_data()
-    print(a.temp_max)
-    print(a.temp_min)
-    print(a.room_temperature)
-    print(a.outside_temp)
-    print(a.human_counter)
-    print(a.co2)
-    print(a.pressure)
-    print(a.time)
-    print(a.timestamp)
+    # print(a.temp_max)
+    # print(a.temp_min)
+    # print(a.room_temperature)
+    # print(a.outside_temp)
+    # print(a.human_counter)
+    # print(a.co2)
+    # print(a.pressure)
+    # print(a.time)
+    # print(a.timestamp)
 
 
     
