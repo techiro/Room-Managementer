@@ -153,7 +153,7 @@ class RoomData(object):
 
     def json_data_send(self, url=None):
         send_url = self.url if url is None else url
-        room_json = {"device_name" : self.device_name, "human" : self.human}
+        room_json = {"device_name" : self.device_name, "human" : self.human, "measured_time" : self.now_datetime.strftime('%s')}
         params = json.dumps(room_json)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(send_url, params, headers=headers)
@@ -220,7 +220,6 @@ if __name__ == "__main__":
                 pass
             else:
                 os.makedirs(log_dir)
-
 
             logging.error(traceback.format_exc())
 
