@@ -8,6 +8,12 @@ def cast_timestamp_array_to_datetime(timestamp_array):
         datetime_array.append(datetime.fromtimestamp(int(timestamp)))
     return datetime_array
 
+def cast_datetime_array_to_timestamp(datetime_array):
+    timestamp_array = []
+    for i in datetime_array:
+        timestamp_array.append(datetime.timestamp(i))
+    return timestamp_array
+
 class CommonData(object):
     def __init__(self):
         self.container = None
@@ -137,11 +143,30 @@ class MergeDynamoData(SpaceData, HumanData):
         else:
             raspi_1_time_adjust = self._compare_time_array(raspi_1_day_data.time)
             raspi_2_time_adjust = self._compare_time_array(raspi_2_day_data.time)
-            # self.temp_max = self._data_adjust(raspi_1_day_data.temp_max, raspi_1_time_adjust)
-            # self.temp_min = self._data_adjust(raspi_1_day_data.temp_min, raspi_1_time_adjust)
+            self.time = self.this_days_datetime_array
+            self.temp_max = self._data_adjust(raspi_2_day_data.temp_max, raspi_2_time_adjust)
+            self.temp_min = self._data_adjust(raspi_2_day_data.temp_min, raspi_2_time_adjust)
+            self.humidity = self._data_adjust(raspi_2_day_data.humidity, raspi_2_time_adjust)
+            self.room_temperature = self._data_adjust(raspi_2_day_data.room_temperature, raspi_2_time_adjust)
+            self.outside_temp = self._data_adjust(raspi_2_day_data.outside_temp, raspi_2_time_adjust)
+            self.pressure = self._data_adjust(raspi_2_day_data.pressure, raspi_2_time_adjust)
+            self.co2 = self._data_adjust(raspi_2_day_data.co2, raspi_2_time_adjust)
+            self.human_counter = self._data_adjust(raspi_1_day_data.human_counter, raspi_1_time_adjust)
+            self.timestamp = cast_datetime_array_to_timestamp(self.time)
+
+        return self
 
 
-    # def _data_adjust(self, , time_array):
+    def _data_adjust(self, data_array, time_array):
+        new_data_array = []
+        counter = 0
+        for flg in time_array:
+            if flg is True:
+                new_data_array.append(data_array[counter])
+                counter += 1
+            else:
+                new_data_array.append(None)
+        return new_data_array
         
             
         
@@ -194,9 +219,9 @@ class MergeDynamoData(SpaceData, HumanData):
 if __name__ == "__main__":
 
     # --- raspi 1 はまだ未実装 ----
-    raspi_1_data = dynamoData('raspi_1')
-    today_raspi_1_data = raspi_1_data.get_today_data()
-    print(today_raspi_1_data.time)
+    # raspi_1_data = dynamoData('raspi_1')
+    # today_raspi_1_data = raspi_1_data.get_today_data()
+    # print(today_raspi_1_data.time)
 
     # yesterday_raspi_1_data = raspi_1_data.get_n_days_ago_data(1)
     # print(yesterday_raspi_1_data.time)
@@ -208,8 +233,17 @@ if __name__ == "__main__":
     # raspi_2_data = dynamoData(dynamoData.raspi_2)
     # two_days_ago_data = raspi_2_data.get_n_days_ago_data(4)
     # print(two_days_ago_data.timestamp)
-    # mergeDynamoData = MergeDynamoData()
-    # mergeDynamoData.get_today_data()
+    mergeDynamoData = MergeDynamoData()
+    a = mergeDynamoData.get_today_data()
+    print(a.temp_max)
+    print(a.temp_min)
+    print(a.room_temperature)
+    print(a.outside_temp)
+    print(a.human_counter)
+    print(a.co2)
+    print(a.pressure)
+    print(a.time)
+    print(a.timestamp)
 
 
     
