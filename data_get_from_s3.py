@@ -1,13 +1,220 @@
 import boto3
 from datetime import datetime, timedelta
 from boto3.dynamodb.conditions import Key, Attr
- 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.ticker import AutoMinorLocator
+##以下は消す
+import os
+import requests
+import json
 def cast_timestamp_array_to_datetime(timestamp_array):
     datetime_array = []
     for timestamp in timestamp_array:
         datetime_array.append(datetime.fromtimestamp(int(timestamp)))
     return datetime_array
 
+
+class MakeGraph(object):
+    def __init__(self, spacedata):
+        self.counter = spacedata.counter
+        self.outside_graph = spacedata.outside_temp
+        self.inside_graph = spacedata.room_temperature
+        self.co2_graph = spacedata.co2
+        self.humidity_graph = spacedata.humidity
+        self.time_graph = spacedata.time
+        self.pressure_graph = spacedata.pressure
+        self.location = 'plute-room-picture'
+        self.save_dir = '/tmp/'
+        self.hour = [f"{num}:00" for num in range(0,24,2)]
+        self.figure_num = 0
+        self.today_start = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+        self.today_end = self.today_start + timedelta(days=1) - timedelta(minutes=1)
+        self.now = datetime.now()
+        self.xfmt = mdates.DateFormatter("%H:%M")
+        self.xloc = mdates.HourLocator(byhour=range(0, 24, 2), tz=None)
+    def _graph_name(self,location,label_name):
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(location)
+        fig_name = 'figure_{0:%m%d%H%M}_{1}'.format(self.now,label_name)
+        return fig_name
+    def push_s3_object(self,objectname):
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(self.location)
+        bucket.upload_file('/tmp/{0}.png'.format(objectname), 'gragh/{0}.png'.format(objectname))
+        print(objectname)
+
+    def _put_graph_toslack(self,filename):
+        url = 'https://plute-room-picture.s3-ap-northeast-1.amazonaws.com/gragh/{0}.png'.format(filename)
+        print(url)
+        SLACK_POST_URL = 'https://hooks.slack.com/services/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'
+        _counter = self.counter
+        _counter = 0 if _counter == 0 else _counter-1
+        print(_counter)
+        nowtime = '{0:%m月%d日%H:%M}'.format(self.time_graph[_counter])
+        nowtemparature = self.inside_graph[_counter]
+        nowhumidity = self.humidity_graph[_counter]
+        nowco2 = self.co2_graph[_counter]
+        nowpressure = self.pressure_graph[_counter]
+        content = f"plutoの最新の状態:\n時刻{nowtime}\n温度{nowtemparature}℃\n湿度:{nowhumidity}%\n気圧:{nowpressure}hPa\nCO2:{nowco2}ppm"
+
+        post_json = {
+            "text": content,
+            "attachments": [{
+            "fallback": filename,
+            "text": filename,
+            "color": "#36a64f", #// 'good'、'warning'、'danger' 、または 16 進数のカラーコードのいずれかになります
+            "image_url": url
+            }]
+        }
+        requests.post(SLACK_POST_URL, data=json.dumps(post_json))
+
+        
+    def make2graph(self,data1,data2,label_name1,label_name2):
+        fig = plt.figure(self.figure_num,figsize=(12,6))
+        self.figure_num = + 1
+        ax = fig.add_subplot(1,1,1)
+        plt.plot(self.time_graph, data1,label=label_name1)
+        plt.plot(self.time_graph, data2,label=label_name2)
+
+        ax.xaxis.set_major_locator(self.xloc)
+        ax.xaxis.set_major_formatter(self.xfmt)
+        ax.set_xlim(self.today_start, self.today_end) 
+
+        ave=np.average(data1)
+
+        ax.set_ylim([ave*0.75,ave*1.3])
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+        plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
+        ax.legend()
+        plt.grid()
+        fig_name = self._graph_name(self.location,'Temperature')
+        plt.savefig(os.path.join(self.save_dir, fig_name))
+        self.push_s3_object(fig_name)
+        self._put_graph_toslack(fig_name)
+        plt.cla()
+        plt.clf()
+        plt.close()
+
+
+
+    def makedynamicgraph(self,data,label_name,ylim=None):
+        fig = plt.figure(self.figure_num,figsize=(12, 6))
+        ax = fig.add_subplot(1,1,1)
+        self.figure_num = + 1
+        plt.plot(self.time_graph, data,label=label_name)
+        xfmt = mdates.DateFormatter("%H:%M")
+        xloc = mdates.HourLocator(byhour=range(0, 24, 2), tz=None)
+        if ylim == None:
+            ave=np.average(data)
+            ax.set_ylim([ave*0.75,ave*1.3])    
+        else:
+            ax.set_ylim(ylim)
+        
+        ax.xaxis.set_major_locator(xloc)
+        ax.xaxis.set_major_formatter(xfmt)
+        ax.set_xlim(self.today_start, self.today_end)
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+        ax.legend()
+        plt.grid()
+        fig_name = self._graph_name(self.location,label_name)
+        plt.savefig(os.path.join(self.save_dir, fig_name))
+        self.push_s3_object(fig_name)
+        self._put_graph_toslack(fig_name)
+        plt.cla()
+        plt.clf()
+        plt.close()
+
+
+    def make_humidity_graph(self):
+        self.makedynamicgraph(today_graph.humidity_graph,"Humidity",[30,120])
+    def make_temp_graph(self):
+        self.make2graph(today_graph.outside_graph,today_graph.inside_graph,"outside-temp","room-temp")
+    def make_co2_graph(self):
+        self.makedynamicgraph(today_graph.co2_graph,"CO2",[300,1500])
+    def make_pressure_graph(self):
+        self.makedynamicgraph(today_graph.pressure_graph,"Pressure")
+    def make_human_graph(self):
+        self.makedynamicgraph(raspi_1_graph.human_graph,"Human")
+    
+
+class MakeGraph1(object):
+    def __init__(self, spacedata):
+        self.human_graph = spacedata.human_counter
+        self.counter = spacedata.counter
+        self.time_graph = spacedata.time
+        self.location = 'plute-room-picture'
+        self.save_dir = '/tmp/'
+        self.hour = [f"{num}:00" for num in range(0,24,2)]
+        self.figure_num = 0
+        self.today_start = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+        self.today_end = self.today_start + timedelta(days=1) - timedelta(minutes=1)
+        self.now = datetime.now()
+        self.xfmt = mdates.DateFormatter("%H:%M")
+        self.xloc = mdates.HourLocator(byhour=range(0, 24, 2), tz=None)
+    def _graph_name(self,location,label_name):
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(location)
+        fig_name = 'figure_{0:%m%d%H%M}_{1}'.format(self.now,label_name)
+        return fig_name
+    def push_s3_object(self,objectname):
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(self.location)
+        bucket.upload_file('/tmp/{0}.png'.format(objectname), 'gragh/{0}.png'.format(objectname))
+        print(objectname)
+
+    def _put_graph_toslack(self,filename):
+        url = 'https://plute-room-picture.s3-ap-northeast-1.amazonaws.com/gragh/{0}.png'.format(filename)
+        print(url)
+        SLACK_POST_URL = 'https://hooks.slack.com/services/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'
+        _counter = self.counter
+        _counter = 0 if _counter == 0 else _counter-1
+        print(_counter)
+        nowtime = '{0:%m月%d日%H:%M}'.format(self.time_graph[_counter])
+        nowhuman = self.human_graph[_counter]
+        content = f"plutoの最新の状態:\n時刻{nowtime}\n人数{nowhuman}人"
+
+        post_json = {
+            "text": content,
+            "attachments": [{
+            "fallback": filename,
+            "text": filename,
+            "color": "#36a64f", #// 'good'、'warning'、'danger' 、または 16 進数のカラーコードのいずれかになります
+            "image_url": url
+            }]
+        }
+        requests.post(SLACK_POST_URL, data=json.dumps(post_json))
+
+    def makedynamicgraph(self,data,label_name,ylim=None):
+        fig = plt.figure(self.figure_num,figsize=(12, 6))
+        ax = fig.add_subplot(1,1,1)
+        self.figure_num = + 1
+        plt.plot(self.time_graph, data,label=label_name)
+        xfmt = mdates.DateFormatter("%H:%M")
+        xloc = mdates.HourLocator(byhour=range(0, 24, 2), tz=None)
+        if ylim == None:
+            ave=np.average(data)
+            ax.set_ylim([ave*0.75,ave*1.3])    
+        else:
+            ax.set_ylim(ylim)
+        
+        ax.xaxis.set_major_locator(xloc)
+        ax.xaxis.set_major_formatter(xfmt)
+        ax.set_xlim(self.today_start, self.today_end)
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+        ax.legend()
+        plt.grid()
+        fig_name = self._graph_name(self.location,label_name)
+        plt.savefig(os.path.join(self.save_dir, fig_name))
+        self.push_s3_object(fig_name)
+        self._put_graph_toslack(fig_name)
+        plt.cla()
+        plt.clf()
+        plt.close()
+
+    def make_human_graph(self):
+        self.makedynamicgraph(raspi_1_graph.human_graph,"Human",[-3,8])
 class CommonData(object):
     def __init__(self):
         self.container = None
@@ -196,20 +403,33 @@ if __name__ == "__main__":
     # --- raspi 1 はまだ未実装 ----
     raspi_1_data = dynamoData('raspi_1')
     today_raspi_1_data = raspi_1_data.get_today_data()
-    print(today_raspi_1_data.time)
 
-    # yesterday_raspi_1_data = raspi_1_data.get_n_days_ago_data(1)
-    # print(yesterday_raspi_1_data.time)
-    # print(len(today_raspi_1_data.human_counter))
+    raspi_1_graph = MakeGraph1(today_raspi_1_data)
+    raspi_1_graph.make_human_graph()
+    # raspi_2_data = dynamoData('raspi_2') 
+    # today_raspi_2_data = raspi_2_data.get_today_data()
 
-    # raspi_2_data = dynamoData(dynamoData.raspi_2)
-    # yesterday_data = raspi_2_data.get_yesterday_data()
-    # print(yesterday_data.time)
-    # raspi_2_data = dynamoData(dynamoData.raspi_2)
-    # two_days_ago_data = raspi_2_data.get_n_days_ago_data(4)
-    # print(two_days_ago_data.timestamp)
-    # mergeDynamoData = MergeDynamoData()
-    # mergeDynamoData.get_today_data()
+    # print(today_raspi_2_data.time)
+    # # print(yesterday_data.room_temperature)
+    # # print(yesterday_data.counter)
 
+    # raspi_1_data = dynamoData('raspi_1')
+    # print(raspi_1_data)
+    # today_raspi1_data = raspi_1_data.get_today_data()
+    # print(today_raspi1_data)
+    # raspi_1_graph = MakeGraph(today_raspi1_data)
+    # raspi_1_graph.make_human_graph()
+
+
+    # today_graph = MakeGraph(today_data)
+
+
+    # today_graph.make_humidity_graph()
+    # today_graph.make_temp_graph()
+    # today_graph.make_co2_graph()
+    # today_graph.make_pressure_graph()
+    #人の人数をグラフにする。
+
+    
 
     
