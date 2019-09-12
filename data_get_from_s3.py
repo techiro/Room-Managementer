@@ -31,14 +31,15 @@ class CommonData(object):
         timestamp_arrays = []
         for i in range(len(self.container)):
             # 全部 26分0秒とか、0秒にしたいので
-            now_timestamp = datetime.fromtimestamp(int(self.container[i][keyword])).replace(second=0, microsecond=0)
+            now_timestamp = None if self.container[i][keyword] == None else datetime.fromtimestamp(int(self.container[i][keyword])).replace(second=0, microsecond=0)
             timestamp_arrays.append(int(now_timestamp.timestamp()))
         return timestamp_arrays
 
     def _float_data_extraction(self, keyword):
         keyword_data = []
         for i in range(len(self.container)):
-            keyword_data.append(round(float(self.container[i][keyword]), 1))
+            data = None if self.container[i][keyword] == None else round(float(self.container[i][keyword]), 1)
+            keyword_data.append(data)
         return keyword_data
 
 
@@ -260,4 +261,8 @@ if __name__ == "__main__":
     # print(a.timestamp)
 
 
-    
+    # -*- coding: utf-8 -*-
+# refer http://eleparts.co.kr/data/design/product_file/SENSOR/gas/MH-Z19_CO2%20Manual%20V2.pdf
+#
+# <C2><A9> Takeyuki UEDA 2015 -
+

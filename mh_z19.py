@@ -34,27 +34,23 @@ def mh_z19():
       if len(s) >= 4 and s[0] == 255 and s[1] == 134:
         return s[2]*256 + s[3]
       break
-#  except IOError:
-#    slider.io_error_report()
-#  except:
-#    slider.unknown_error_report()
   except:
       print("error")
       print(traceback.format_exc())
       pass
 
 def read():
+  try:
     p = subprocess.call(stop_getty, stdout=subprocess.PIPE, shell=True)
     result = mh_z19()
     print(result)
 #    p = subprocess.call(start_getty, stdout=subprocess.PIPE, shell=True)
-    if result is not None:
-        return result
-    else:
-        return None
+    return result
+  except:
+    print("CO2 sensor error　　co2センサーの接続を確認してください")
+    return None
+
 if __name__ == '__main__':
-# #  value = mh_z19()
-# #  print "co2=", value["co2"]
     value = read()
     if value is not None:
         print(value)

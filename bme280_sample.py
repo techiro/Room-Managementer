@@ -140,9 +140,9 @@ class Bme(object):
 		self.writeReg(0xF4,ctrl_meas_reg)
 		self.writeReg(0xF5,config_reg)
 
-bme = Bme()
-bme.setup()
-bme.get_calib_param()
+# bme = Bme()
+# bme.setup()
+# bme.get_calib_param()
 
 
 if __name__ == '__main__':
