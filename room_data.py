@@ -35,10 +35,19 @@ class RoomData(object):
 
     def measure_data(self):
         print("now, getting temperature, humidity, pressure, by bme280")
-        bme280.bme.readData()
-        self.measure_temperature()
-        self.measure_humidity()
-        self.measure_pressure()
+        try:
+            bme = bme280.Bme()
+            bme.setup()
+            bme.get_calib_param()
+            bme.readData()
+            self.measure_temperature()
+            self.measure_humidity()
+            self.measure_pressure()
+        except:
+            print("bme280 error in room_data.py  RoomData().measure_data , 温度センサーの接続を確認してください")
+            self.temperature = None
+            self.humidity = None
+            self.pressure = None
         
         # self.measure_illuminance()
 
