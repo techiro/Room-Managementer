@@ -33,15 +33,14 @@ class CommonData(object):
             # 全部 26分0秒とか、0秒にしたいので
             now_timestamp = datetime.fromtimestamp(int(self.container[i][keyword])).replace(second=0, microsecond=0)
             timestamp_arrays.append(int(now_timestamp.timestamp()))
-            # keyword_data.append(round(int(self.container[i][keyword]), 1))
         return timestamp_arrays
 
     def _float_data_extraction(self, keyword):
         keyword_data = []
         for i in range(len(self.container)):
-            #if self.container[i][""]
             keyword_data.append(round(float(self.container[i][keyword]), 1))
         return keyword_data
+
 
 class SpaceData(CommonData):
     def __init__(self):
@@ -63,6 +62,7 @@ class SpaceData(CommonData):
         self.co2 = super()._float_data_extraction("CO2")
         self.humidity = super()._float_data_extraction("humidity")
         self.pressure = super()._float_data_extraction("pressure")
+
 
 class HumanData(CommonData):
     def __init__(self):
@@ -133,16 +133,26 @@ class MergeDynamoData(SpaceData, HumanData):
     def _data_merge(self, raspi_1_day_data, raspi_2_day_data):
         self.this_days_datetime_array = self._get_this_days_datetime_array(raspi_1_day_data.time[0])
         if self.this_days_datetime_array[0] == raspi_2_day_data.time[0].replace(hour=0,minute=0,second=0,microsecond=0):
-            print("success data adjust !!")
+            print("this day data start from 0:00  !!")
         else:
-            print("failed data adjust ! --------")
+            print("this day data don't start from 0:00")
         
         day_minutes = 24 * 60
         if len(raspi_1_day_data.timestamp) == day_minutes and len(raspi_2_day_data.timestamp) == day_minutes:
-            pass
+            self.temp_max = raspi_2_day_data.temp_max
+            self.temp_min = raspi_2_day_data.temp_min
+            self.humidity = raspi_2_day_data.humidity
+            self.room_temperature = raspi_2_day_data.room_temperature
+            self.outside_temp = raspi_2_day_data.outside_temp
+            self.pressure = raspi_2_day_data.pressure
+            self.co2 = raspi_2_day_data.co2
+            self.human_counter = raspi_1_day_data.human_counter
+            self.timestamp = raspi_1_day_data.timestamp
+            self.time = cast_timestamp_array_to_datetime(self.timestamp)
+            self.counter = len(self.timestamp)
         else:
-            raspi_1_time_adjust = self._compare_time_array(raspi_1_day_data.time)
             raspi_2_time_adjust = self._compare_time_array(raspi_2_day_data.time)
+            raspi_1_time_adjust = self._compare_time_array(raspi_1_day_data.time)
             self.time = self.this_days_datetime_array
             self.temp_max = self._data_adjust(raspi_2_day_data.temp_max, raspi_2_time_adjust)
             self.temp_min = self._data_adjust(raspi_2_day_data.temp_min, raspi_2_time_adjust)
@@ -154,6 +164,13 @@ class MergeDynamoData(SpaceData, HumanData):
             self.human_counter = self._data_adjust(raspi_1_day_data.human_counter, raspi_1_time_adjust)
             self.timestamp = cast_datetime_array_to_timestamp(self.time)
             self.counter = len(self.timestamp)
+            # print(len(self.human_counter))
+            # count = 0
+            # for i in raspi_1_time_adjust:
+            #     if i is True:
+            #         count += 1
+            # print(count)
+            # print(len(raspi_1_day_data.time))
 
         return self
 
@@ -172,14 +189,17 @@ class MergeDynamoData(SpaceData, HumanData):
         new_data_time_array = []
         j = 0
         for i in range(len(data_time_array)):
+            # print("{0}  {1}  {2}".format(self.this_days_datetime_array[i+j], data_time_array[i], self.this_days_datetime_array[i+j] == data_time_array[i]))
             if self.this_days_datetime_array[i + j] == data_time_array[i]:
                 new_data_time_array.append(True)
             else:
                 # print(" ------- error raised -------")
-                for k in range(i + j, len(self.this_days_datetime_array)):
+                for k in range(i + j + 1, len(self.this_days_datetime_array)):
                     new_data_time_array.append(False)
+                    # print("{0}  {1}  {2}".format(self.this_days_datetime_array[k] ,data_time_array[i], self.this_days_datetime_array[k] == data_time_array[i]))
                     if self.this_days_datetime_array[k] == data_time_array[i]:
                         j = k - i
+                        new_data_time_array.append(True)
                         break
         for i in range(len(self.this_days_datetime_array) - len(new_data_time_array)):
             new_data_time_array.append(False)
@@ -213,9 +233,9 @@ class MergeDynamoData(SpaceData, HumanData):
 if __name__ == "__main__":
 
     # --- raspi 1 はまだ未実装 ----
-    # raspi_1_data = dynamoData('raspi_1')
-    # today_raspi_1_data = raspi_1_data.get_today_data()
-    # print(today_raspi_1_data.time)
+    raspi_1_data = dynamoData('raspi_1')
+    today_raspi_1_data = raspi_1_data.get_today_data()
+    # print(today_raspi_1_data.human_counter)
 
     # yesterday_raspi_1_data = raspi_1_data.get_n_days_ago_data(1)
     # print(yesterday_raspi_1_data.time)
