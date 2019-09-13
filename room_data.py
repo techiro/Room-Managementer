@@ -16,8 +16,8 @@ import logging
 
 import traceback
 
-logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
-logging.basicConfig(filename='log/room_data_log', level=logging.INFO, format=logging_fmt)
+#logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
+#logging.basicConfig(filename='log/room_data_log', level=logging.INFO, format=logging_fmt)
 
 
 class RoomData(object):
@@ -31,19 +31,20 @@ class RoomData(object):
         self.co2 = 1000
         self.device_name = "raspi_2"
         self.url = "http://funnel.soracom.io"
+        self.bme = bme280.Bme()
         self.room_datas = None
 
     def measure_data(self):
         print("now, getting temperature, humidity, pressure, by bme280")
         try:
-            bme = bme280.Bme()
-            bme.setup()
-            bme.get_calib_param()
-            bme.readData()
+            self.bme.setup()
+            self.bme.get_calib_param()
+            self.bme.readData()
             self.measure_temperature()
             self.measure_humidity()
             self.measure_pressure()
         except:
+            print(traceback.format_exc())
             print("bme280 error in room_data.py  RoomData().measure_data , 温度センサーの接続を確認してください")
             self.temperature = None
             self.humidity = None
@@ -54,11 +55,11 @@ class RoomData(object):
         self.measure_co2()
 
     def measure_temperature(self):
-        self.temperature = bme280.bme.temperature
+        self.temperature = self.bme.temperature
     def measure_humidity(self):
-        self.humidity = bme280.bme.humidity
+        self.humidity = self.bme.humidity
     def measure_pressure(self):
-        self.pressure = bme280.bme.pressure
+        self.pressure = self.bme.pressure
     def measure_illuminance(self):
         print("now, getting illuminance, by BH1750FVI ")
         self.illuminance = illum.measure_lux()
