@@ -1,0 +1,3 @@
+getrpimodel
+smbus2
+boto3
