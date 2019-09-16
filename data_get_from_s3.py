@@ -30,7 +30,7 @@ class CommonData(object):
     def _adjust_timestamp(self, keyword):
         timestamp_arrays = []
         for i in range(len(self.container)):
-            # 全部 26分0秒とか、0秒にしたいので
+            # 全部 26分0秒とか、0秒にしたいので 
             now_timestamp = None if self.container[i][keyword] == None else datetime.fromtimestamp(int(self.container[i][keyword])).replace(second=0, microsecond=0)
             timestamp_arrays.append(int(now_timestamp.timestamp()))
         return timestamp_arrays
@@ -189,17 +189,22 @@ class MergeDynamoData(SpaceData, HumanData):
     def _compare_time_array(self, data_time_array):
         new_data_time_array = []
         j = 0
-        for i in range(len(data_time_array)):
-            # print("{0}  {1}  {2}".format(self.this_days_datetime_array[i+j], data_time_array[i], self.this_days_datetime_array[i+j] == data_time_array[i]))
+        for i in range(len(data_time_array) -1):
+
+            if data_time_array[i] == data_time_array[i+1]:
+                j -= 1
+                continue
+
+            print("{0}  {1}  {2}".format(self.this_days_datetime_array[i+j], data_time_array[i], self.this_days_datetime_array[i+j] == data_time_array[i]))
             if self.this_days_datetime_array[i + j] == data_time_array[i]:
                 new_data_time_array.append(True)
             else:
-                # print(" ------- error raised -------")
+                print(" ------- error raised -------")
                 for k in range(i + j + 1, len(self.this_days_datetime_array)):
                     new_data_time_array.append(False)
-                    # print("{0}  {1}  {2}".format(self.this_days_datetime_array[k] ,data_time_array[i], self.this_days_datetime_array[k] == data_time_array[i]))
+                    print("{0}  {1}  {2}".format(self.this_days_datetime_array[k] ,data_time_array[i], self.this_days_datetime_array[k] == data_time_array[i]))
                     if self.this_days_datetime_array[k] == data_time_array[i]:
-                        j = k - i
+                        j = k - i - 3
                         new_data_time_array.append(True)
                         break
         for i in range(len(self.this_days_datetime_array) - len(new_data_time_array)):
@@ -234,8 +239,8 @@ class MergeDynamoData(SpaceData, HumanData):
 if __name__ == "__main__":
 
     # --- raspi 1 はまだ未実装 ----
-    raspi_1_data = dynamoData('raspi_1')
-    today_raspi_1_data = raspi_1_data.get_today_data()
+    # raspi_1_data = dynamoData('raspi_1')
+    # today_raspi_1_data = raspi_1_data.get_today_data()
     # print(today_raspi_1_data.human_counter)
 
     # yesterday_raspi_1_data = raspi_1_data.get_n_days_ago_data(1)
@@ -250,6 +255,9 @@ if __name__ == "__main__":
     # print(two_days_ago_data.timestamp)
     mergeDynamoData = MergeDynamoData()
     a = mergeDynamoData.get_today_data()
+    print(len(a.temp_min))
+    # for i in a.temp_max:
+    #     print(i)
     # print(a.temp_max)
     # print(a.temp_min)
     # print(a.room_temperature)
