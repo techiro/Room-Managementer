@@ -32,6 +32,7 @@ from object_detection.utils import visualization_utils as vis_util
 ##   logging for debug
 logging_fmt = "%(asctime)s  %(levelname)s  %(name)s \n%(message)s\n"
 logging.basicConfig(filename='log/photo_data_log', level=logging.info, format=logging_fmt)
+root_dir = "/home/pi/Desktop/Room-Managementer/"
 
 ###   TensorFlow 制御部       ####
 
@@ -96,12 +97,12 @@ def confirm_and_create_dir(dirname):
 detection_graph = tf.Graph()
 with detection_graph.as_default():
   od_graph_def = tf.GraphDef()
-  with tf.gfile.GFile('ssd_mobilenet_v1_coco_2018_01_28/frozen_inference_graph.pb', 'rb') as fid:
+  with tf.gfile.GFile(root_dir + 'ssd_mobilenet_v1_coco_2018_01_28/frozen_inference_graph.pb', 'rb') as fid:
     serialized_graph = fid.read()
     od_graph_def.ParseFromString(serialized_graph)
     tf.import_graph_def(od_graph_def, name='')
 
-label_map = label_map_util.load_labelmap('mscoco_label_map.pbtxt')
+label_map = label_map_util.load_labelmap(root_dir + 'mscoco_label_map.pbtxt')
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=90, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
@@ -111,7 +112,7 @@ class Media(object):
         self.now_datetime = now_datetime
         self.create_mdeia_directory()
         self.media_name = str(self.now_datetime.hour) + "時_" + str(self.now_datetime.minute) + "分"
-        self.media_root = "media/" + self.media_name
+        self.media_root = root_dir + "media/" + self.media_name
         self.media_ext = ".jpg"
         self.media_path = self.media_root + self.media_ext
         self.output_media_path = self.media_root + "_output" + self.media_ext
