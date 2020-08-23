@@ -11,3 +11,5 @@
 pip3 isntall getrpimodel
 pip3 install smbus2
 pip3 install boto3
+
+condaコマンドは使用していない。
